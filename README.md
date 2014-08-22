@@ -1,8 +1,3 @@
-TaskStore
-=========
-
-A simple, efficient, fault-tolerant task store for coordinating activity between multiple hosts.
-
 #Task Store
 by Chris Monson
 
