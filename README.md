@@ -2,20 +2,14 @@
 by Chris Monson
 
 A simple, no-frills place to put tasks with safe coordination semantics.
-To get the library and install it for use in your code:
 
-    go get github.com/shiblon/taskstore
-    go install github.com/shiblon/taskstore
+tl;dr:
 
-If you just want to run a service and access its RESTful API:
-
+    go get -d -t github.com/shiblon/taskstore
     go install github.com/shiblon/taskstore/service/server
-
-Finally, if you want to access the RESTful API remotely from Go:
-
     go install github.com/shiblon/taskstore/service/client
 
-Of course, you can always clone the entire repository (and perhaps get more than you bargained for - reorganization is badly needed and will hopefully come soon - today is May 19, 2014).
+Of course, you can always clone the entire repository and hack on it yourself. If that floats your boat, patches and pull requests are always welcome.
 
 The TaskStore is fault-tolerant transactional task maintenance software. Basically, it allows you to have multiple workers creating and consuming small chunks of data with some hard guarantees on consistency. This enables you, for example, to create things like a MapReduce framework: input data is transformed into map tasks, map workers consume tasks so long as there are any to consume, they then produce tasks corresponding to their map output, and reduce workers pick up those tasks and emit output data. Central to all of this is a process flow that is based on the production and consumption of tasks, all done in a fault-tolerant way that maintains consistency through multiple parallel accessors, crashes, and evictions.
 
@@ -214,7 +208,13 @@ An update either completely succeeds or completely fails. If any of the tasks sp
 
 If it succeeds, then it returns all of the new tasks in a single JSON list in the order specified: adds first, followed by updates. This way you can track the way that the ID changes across updates, and can do things like renew your claim on a changed task later on.
 
-The JSON returned is an object with two fields: `tasks` and `errors`. They will never be simultaneously present. The `tasks` member is a list of tasks just like that returned by a GET request on `/tasks`, and the `error` member is a list of error strings indicating all of the reasons that a transaction may have failed.
+The JSON returned is an object with two fields: `tasks` and `error`. The `tasks` member is a list of tasks just like that returned by a GET request on `/tasks`, and the `error` member is a JSON object potentially containing several lists:
+
+* `changes`: a list of task IDs that failed because they were not present to be modified.
+* `deletes`: a list of task IDs that failed because they were not present to be deleted.
+* `depends`: a list of task IDs that were not present and thus kept other changes or deletions from happening.
+* `owned`: a list of task IDs that could not be changed because they were owned by another client.
+* `bugs`: a list of errors indicating that some unexpected conditions occurred.
 
 ##`/claim`
 
