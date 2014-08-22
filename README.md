@@ -2,18 +2,18 @@
 by Chris Monson
 
 A simple, no-frills place to put tasks with safe coordination semantics.
+To get the library and install it for use in your code:
 
-```
-  go install https://github.com/shiblon/taskstore
-```
+    go get github.com/shiblon/taskstore
+    go install github.com/shiblon/taskstore
 
-If you want the client and server code:
+If you just want to run a service and access its RESTful API:
 
-```
-  go install http://code.google.com/p/entrogo/taskstore/service/protocol
-  go install http://code.google.com/p/entrogo/taskstore/service/client
-  go install http://code.google.com/p/entrogo/taskstore/service/server
-```
+    go install github.com/shiblon/taskstore/service/server
+
+Finally, if you want to access the RESTful API remotely from Go:
+
+    go install github.com/shiblon/taskstore/service/client
 
 Of course, you can always clone the entire repository (and perhaps get more than you bargained for - reorganization is badly needed and will hopefully come soon - today is May 19, 2014).
 
