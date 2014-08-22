@@ -4,8 +4,7 @@ by Chris Monson
 A simple, no-frills place to put tasks with safe coordination semantics.
 
 ```
-  go install http://code.google.com/p/entrogo/keyheap
-  go install http://code.google.com/p/entrogo/taskstore
+  go install https://github.com/shiblon/taskstore
 ```
 
 If you want the client and server code:
