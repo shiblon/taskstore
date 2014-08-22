@@ -22,8 +22,6 @@ The TaskStore is fault-tolerant transactional task maintenance software. Basical
 
 It has been designed to be as modular and simple as possible, only implementing what is needed to fulfill the needed guarantees. This simplicity not only makes it easy to reason about so that it can be used correctly, but also makes it easier to maintain while preserving correctness. It is just a transactional task store, and does not implement anything else like a message service, nor does it depend on one. A sample server process has been included, as has a sample client library. These are by no means the only way in which the TaskStore can be used, but they do give an idea of how one might use it, and they can be used as is for many needs.
 
-<wiki:toc/>
-
 #Introduction
 
 The TaskStore is divided into three basic pieces:
