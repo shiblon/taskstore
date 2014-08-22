@@ -54,19 +54,60 @@ type ClaimRequest struct {
 // A TaskResponse is used to return slices of tasks and errors. For example, if an UpdateRequest fails, the response will contain a list of reasons for the failure in the errors slice.
 type TaskResponse struct {
 	Tasks []TaskInfo        `json:'newtasks'`
-	Error TaskResponseError `json:'errors'`
+	Error *TaskResponseError `json:'error'`
 }
 
 // A TaskResponseError is a slice of errors, one for each portion of a
 // task request that failed.
-type TaskResponseError []error
+type TaskResponseError struct {
+	// Changes contains the list of tasks that were not present and could thus not be changed.
+	Changes []int64 `json:'changes'`
 
-// Error satisfies the error interface, and produces a string representation of
-// the errors within the response.
-func (e TaskResponseError) Error() string {
-	strs := make([]string, len(e))
-	for i, err := range e {
-		strs[i] = err.Error()
+	// Deletes contains the list of IDs that could not be deleted.
+	Deletes []int64 `json:'deletes'`
+
+	// Depends contains the list of IDs that were not present and caused the update to fail.
+	Depends []int64 `json:'depends'`
+
+	// Owned contains the list of IDs that were owned by another client and could not be changed.
+	Owned []int64 `json:'owned'`
+
+	// Bugs contains a list of errors representing caller precondition failures (bad inputs).
+	Bugs []error `json:'bugs'`
+}
+
+func (te *TaskResponseError) HasDependencyErrors() bool {
+	return len(te.Changes) > 0 || len(te.Deletes) > 0 || len(te.Depends) > 0 || len(te.Owned) > 0
+}
+
+func (te *TaskResponseError) HasBugs() bool {
+	return len(te.Bugs) > 0
+}
+
+func (te *TaskResponseError) HasErrors() bool {
+	return te.HasDependencyErrors() || te.HasBugs()
+}
+
+// Error returns an error string (and satisfies the Error interface).
+func (te *TaskResponseError) Error() string {
+	strs := []string{"update error:"}
+	if len(te.Changes) > 0 {
+		strs = append(strs, fmt.Sprintf("  Change IDs: %d", te.Changes))
 	}
-	return fmt.Sprintf("task request errors:\n  - %s", strings.Join(strs, "\n  - "))
+	if len(te.Deletes) > 0 {
+		strs = append(strs, fmt.Sprintf("  Delete IDs: %d", te.Deletes))
+	}
+	if len(te.Depends) > 0 {
+		strs = append(strs, fmt.Sprintf("  Depend IDs: %d", te.Depends))
+	}
+	if len(te.Owned) > 0 {
+		strs = append(strs, fmt.Sprintf("  Owned IDs: %d", te.Owned))
+	}
+	if len(te.Bugs) > 0 {
+		strs = append(strs, "  Bugs:")
+		for _, e := range te.Bugs {
+			strs = append(strs, fmt.Sprintf("    %v", e))
+		}
+	}
+	return strings.Join(strs, "\n")
 }

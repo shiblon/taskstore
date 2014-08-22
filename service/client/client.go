@@ -207,7 +207,7 @@ func (h *HTTPClient) Update(adds, updates []protocol.TaskInfo, deletes, depends 
 	if err := decoder.Decode(&response); err != nil {
 		return nil, err
 	}
-	if response.Error != nil {
+	if response.Error != nil && response.Error.HasErrors() {
 		return nil, response.Error
 	}
 	return response.Tasks, nil

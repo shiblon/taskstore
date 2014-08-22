@@ -394,7 +394,7 @@ func (t *TaskStore) update(up reqUpdate) ([]*Task, error) {
 				uerr.Bugs = append(uerr.Bugs, fmt.Errorf("update bug: adding task with empty task group not allowed: %v", task))
 				continue
 			}
-			if !uerr.hasAnyErrors() {
+			if !uerr.HasErrors() {
 				transaction[i] = updateDiff{0, task.Copy()}
 			}
 			continue
@@ -416,7 +416,7 @@ func (t *TaskStore) update(up reqUpdate) ([]*Task, error) {
 		transaction[i] = updateDiff{task.ID, task.Copy()}
 	}
 
-	if uerr.hasAnyErrors() {
+	if uerr.HasErrors() {
 		return nil, uerr
 	}
 

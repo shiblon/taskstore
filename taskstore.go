@@ -141,15 +141,15 @@ type UpdateError struct {
 }
 
 func (ue UpdateError) HasDependencyErrors() bool {
-	return ue.Changes != nil || ue.Deletes != nil || ue.Depends != nil || ue.Owned != nil
+	return len(ue.Changes) > 0 || len(ue.Deletes) > 0 || len(ue.Depends) > 0 || len(ue.Owned) > 0
 }
 
 func (ue UpdateError) HasBugs() bool {
-	return ue.Bugs != nil
+	return len(ue.Bugs) > 0
 }
 
-func (ue UpdateError) hasAnyErrors() bool {
-	return ue.HasDependencyErrors() || ue.Bugs != nil
+func (ue UpdateError) HasErrors() bool {
+	return ue.HasDependencyErrors() || ue.HasBugs()
 }
 
 // Error returns an error string (and satisfies the Error interface).

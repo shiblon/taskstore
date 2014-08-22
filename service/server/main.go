@@ -57,7 +57,10 @@ func NewStoreHandler(dir string, opportunistic bool) (*StoreHandler, error) {
 	if opportunistic {
 		newstoreFunc = taskstore.OpenOpportunistic
 	}
-	store := newstoreFunc(journaler)
+	store, err := newstoreFunc(journaler)
+	if err != nil {
+		return nil, err
+	}
 
 	return &StoreHandler{store}, nil
 }
@@ -264,7 +267,7 @@ func (s *StoreHandler) postClaim(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		uerr := err.(taskstore.UpdateError)
 		response := protocol.TaskResponse{
-			Error: protocol.TaskResponseError(uerr.Errors),
+			Error: newTaskResponseError(uerr),
 		}
 		out, jerr := json.Marshal(response)
 		if jerr != nil {
@@ -361,7 +364,7 @@ func (s *StoreHandler) postUpdate(w http.ResponseWriter, r *http.Request) {
 		// update errors are fine and expected. We just return an error object in that case.
 		uerr := err.(taskstore.UpdateError)
 		response := protocol.TaskResponse{
-			Error: protocol.TaskResponseError(uerr.Errors),
+			Error: newTaskResponseError(uerr),
 		}
 		out, jerr = json.Marshal(response)
 		if jerr != nil {
@@ -397,6 +400,22 @@ func (s *StoreHandler) postUpdate(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
+}
+
+func newTaskResponseError(ue taskstore.UpdateError) *protocol.TaskResponseError {
+	te := &protocol.TaskResponseError{
+		Changes: make([]int64, len(ue.Changes)),
+		Deletes: make([]int64, len(ue.Deletes)),
+		Depends: make([]int64, len(ue.Depends)),
+		Owned: make([]int64, len(ue.Owned)),
+		Bugs: make([]error, len(ue.Bugs)),
+	}
+	copy(te.Changes, ue.Changes)
+	copy(te.Deletes, ue.Deletes)
+	copy(te.Depends, ue.Depends)
+	copy(te.Owned, ue.Owned)
+	copy(te.Bugs, ue.Bugs)
+	return te
 }
 
 func main() {
