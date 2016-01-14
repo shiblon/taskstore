@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Package client implements a client for the HTTP taskstore service.
-package client
+package client // import "entrogo.com/taskstore/service/client"
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/shiblon/taskstore/service/protocol"
+	"entrogo.com/taskstore/service/protocol"
 )
 
 var (

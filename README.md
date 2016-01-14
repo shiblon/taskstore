@@ -5,11 +5,11 @@ A simple, no-frills place to put tasks with safe coordination semantics.
 
 tl;dr:
 
-    go get -d -t github.com/shiblon/taskstore
-    go install github.com/shiblon/taskstore/service/server
-    go install github.com/shiblon/taskstore/service/client
+    go get -d -t entrogo.com/taskstore
+    go install entrogo.com/taskstore/service/server
+    go install entrogo.com/taskstore/service/client
 
-Of course, you can always clone the entire repository and hack on it yourself. If that floats your boat, patches and pull requests are always welcome.
+Of course, you can always clone the entire repository at http://github.com/shiblon/taskstore and hack on it yourself. If that floats your boat, patches and pull requests are always welcome.
 
 The TaskStore is fault-tolerant transactional task maintenance software. Basically, it allows you to have multiple workers creating and consuming small chunks of data with some hard guarantees on consistency. This enables you, for example, to create things like a MapReduce framework: input data is transformed into map tasks, map workers consume tasks so long as there are any to consume, they then produce tasks corresponding to their map output, and reduce workers pick up those tasks and emit output data. Central to all of this is a process flow that is based on the production and consumption of tasks, all done in a fault-tolerant way that maintains consistency through multiple parallel accessors, crashes, and evictions.
 

@@ -32,9 +32,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shiblon/taskstore"
-	"github.com/shiblon/taskstore/journal"
-	"github.com/shiblon/taskstore/service/protocol"
+	"entrogo.com/taskstore"
+	"entrogo.com/taskstore/journal"
+	"entrogo.com/taskstore/service/protocol"
 )
 
 var (

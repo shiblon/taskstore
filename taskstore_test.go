@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package taskstore
+package taskstore // import "entrogo.com/taskstore"
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ import (
 	"testing/quick"
 	"time"
 
-	"github.com/shiblon/taskstore/journal"
+	"entrogo.com/taskstore/journal"
 )
 
 func ExampleTaskStore() {

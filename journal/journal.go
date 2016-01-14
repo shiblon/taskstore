@@ -15,7 +15,7 @@
 // Package journal is an implementation and interface specification for an
 // append-only journal with rotations. It contains a few simple implementations,
 // as well.
-package journal
+package journal // import "entrogo.com/taskstore/journal"
 
 import (
 	"bytes"

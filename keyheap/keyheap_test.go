@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package keyheap
+package keyheap // import "entrogo.com/taskstore/keyheap"
 
 import (
 	"fmt"

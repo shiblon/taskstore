@@ -16,7 +16,7 @@
 Package keyheap implements a library for a simple heap that allows peeking and
 popping from the middle based on a Key() in the stored interface.
 */
-package keyheap
+package keyheap // import "entrogo.com/taskstore/keyheap"
 
 import (
 	"container/heap"

@@ -17,7 +17,7 @@
 // manages data in memory and on disk. It can be used to implement a full-fledged
 // task queue, but it is only the core storage piece. It does not, in particular,
 // implement any networking.
-package taskstore
+package taskstore // import "entrogo.com/taskstore"
 
 import (
 	"errors"
@@ -26,8 +26,8 @@ import (
 
 	"time"
 
-	"github.com/shiblon/taskstore/keyheap"
-	"github.com/shiblon/taskstore/journal"
+	"entrogo.com/taskstore/keyheap"
+	"entrogo.com/taskstore/journal"
 )
 
 var (

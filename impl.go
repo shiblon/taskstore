@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package taskstore
+package taskstore // import "entrogo.com/taskstore"
 
 import (
 	"fmt"
@@ -22,8 +22,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shiblon/taskstore/keyheap"
-	"github.com/shiblon/taskstore/journal"
+	"entrogo.com/taskstore/keyheap"
+	"entrogo.com/taskstore/journal"
 )
 
 // TODO: move snapshot functionality completely out, make it operate only on files.

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Definitions of protocol structures.
-package protocol
+package protocol // import "entrogo.com/taskstore/service/protocol"
 
 import (
 	"fmt"
