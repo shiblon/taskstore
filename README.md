@@ -1,4 +1,4 @@
-#Task Store
+# Task Store
 by Chris Monson
 
 A simple, no-frills place to put tasks with safe coordination semantics.
@@ -15,7 +15,7 @@ The TaskStore is fault-tolerant transactional task maintenance software. Basical
 
 It has been designed to be as modular and simple as possible, only implementing what is needed to fulfill the needed guarantees. This simplicity not only makes it easy to reason about so that it can be used correctly, but also makes it easier to maintain while preserving correctness. It is just a transactional task store, and does not implement anything else like a message service, nor does it depend on one. A sample server process has been included, as has a sample client library. These are by no means the only way in which the TaskStore can be used, but they do give an idea of how one might use it, and they can be used as is for many needs.
 
-#Introduction
+# Introduction
 
 The TaskStore is divided into three basic pieces:
 
@@ -25,7 +25,7 @@ The TaskStore is divided into three basic pieces:
 
 The TaskStore is further divided into task management and journaling. The journaler is an interface that you can implement and pass into the TaskStore upon creation, allowing you to implement something different than what comes with the TaskStore. A basic append-only logging journaler is included.
 
-#The TaskStore Library
+# The TaskStore Library
 
 The TaskStore library can be used to open a persistent store of tasks and then manipulate them safely *in a single process*. The basic design is single-threaded to keep it very simple and easy to reason about and work with. There is only ever one reader/writer, with one exception that will be discussed in the section on journaling.
 
@@ -42,17 +42,17 @@ Because a change in "available time" actually creates a new task, this means tha
 
 Some failure scenarios can help demonstrate the utility of this simple approach.
 
-##Task Abandoned
+## Task Abandoned
 
 Frequently in parallel processing environments, a process busy doing a task will die. This can happen for various reasons, including eviction, data corruption, or process bugs. When it happens to a process that owns a task, that task is now orphaned for a period of time. Eventually, however, the ownership will expire on that task, and another process will be able to claim it.
 
 Because claiming a task actually creates a new task with a new availability time, the old process will not be able to claim the same task.
 
-##Task Delayed
+## Task Delayed
 
 If a process is working, but ends up being delayed or is simply very slow, the task might expire while it is holding it. If this occurs, that task is now available to be picked up by another process, which may decide to start working on it. This means that two processes are working on the same task, but *only the second will be able to commit the work* because the task held by the first is no longer in the store (it disappeared when the second process claimed it). Thus, the first process, when attempting to delete the task or otherwise modify it to indicate that it is finished with it, will get an error that the task is no longer available and can abandon the work that it has completed.
 
-##Task Store Restarted
+## Task Store Restarted
 
 There are two approaches to running a task store: opportunistic journaling and strict journaling.
 
@@ -60,7 +60,7 @@ In the opportunistic scenario, requests involving tasks are fulfilled immediatel
 
 With strict journaling things are even more straightforward: no task requests are fulfilled until *after* the task update is flushed to disk, so no work will be done on a task that the task store does not durably remember. If the task store crashes between flushing to disk and fulfilling the request, that simply means that a task exists that nobody will be able to claim until its expiry: an annoying but safe situation.
 
-##More on Journaling
+## More on Journaling
 
 When the TaskStore is opened, it is given a journal to which it can send transactions and through which it can initiate a snapshot. Commonly a journal just accesses a filesystem, but other approaches are also allowed, e.g., a database.
 
@@ -70,7 +70,7 @@ Even in the case of opportunistic journaling, all access to the in-memory store 
 
 A snapshot is produced when the number of recent transactions reaches some threshold, enabling start-up times to be reduced in the event of a failure. During a snapshot, the operation of the task store can continue normally, as careful attention has been given to allowing this exception to serialized access.
 
-#Anatomy of a Task
+# Anatomy of a Task
 
 What is a Task? A Task is a piece of data with
 
@@ -80,29 +80,29 @@ What is a Task? A Task is a piece of data with
   * An owner, and
   * User-specified data.
 
-##Task ID
+## Task ID
 
 The unique ID is always globally unique and new tasks always have a larger ID number than old tasks. There are never any other tasks in the store with the same ID, and once used, it will never be used again.
 
-##Group Name
+## Group Name
 
 Tasks are organized into "groups" with free-form names. Groups serve to partition tasks in useful ways. For instance, one can claim a new, random task from a particular group knowing only the name of that group. One can also list the tasks, owned or not, within a group. This can serve as a way of determining whether there is any of a particular kind of work left to be done. For example, in a mapreduce scenario, a "map" group might contain all of the map tasks that are not yet completed, and a "reduce" group might contain all of the unfinished reduce tasks.
 
 Groups spring into existence when tasks are created within them, and they disappear when they are empty.
 
-##Available Time
+## Available Time
 
 The "available time" (AT) of a task is the time in milliseconds since the Epoch when a task can be claimed or owned by anyone. If the time is in the future, then the task is not available: some process owns it and is ostensbily busy working on it if the time is in the future. In fact, "claim"ing a task involves setting its owner ID and advancing its AT to a future time (and, of course, creating a new ID for it, as these operations create a new task).
 
-##Owner ID
+## Owner ID
 
 Each client of the task store is required to provide a unique ID that represents it. This is often achieved by obtaining a random number. The client library, for example, works in precisely this way: when the library loads, it creates a unique ID, and any uses of that library will share it. This gives each process its own (probably) unique identifier. The task store does not assign identifiers to clients.
 
-##Data
+## Data
 
 Each task can optionally contain a slice of bytes, the data that describes the task. Sometimes a task requires no explanation; it's presence is sufficient. Most of the time, tasks will require some data. A map task, for example, will probably want to descirbe the file from which it is to read the data, and perhaps the offsets within that file. Because it is only a byte slice, the data is not interpreted in any way by the task store. It is simply passed around as an opaque entity.
 
-#Task Service
+# Task Service
 
 Users of the task store are of course welcome to create their own service using the taskstore library as the underlying mechanism for storage and maintenance of tasks. Even so, a taskstore service is included with this distribution that exposes the operations of the taskstore over HTTP using a simple RESTful API. Among other things, this approach assumes that all task data is a *string*, not a slice of bytes.
 
@@ -122,11 +122,11 @@ In addition to retrieving, the store can be updated (including task claiming) by
 
 All of the above are described in their own section below.
 
-##`/groups`
+## `/groups`
 
 Issue a GET request to `/groups` to return a JSON list of all non-empty group names in the task store. It may not be perfectly current.
 
-##`/task/<ID>`
+## `/task/<ID>`
 
 Issue a GET request to `/task/<ID>` to obtain information about the task of the given ID. The ID is numeric (only digits), e.g., `/task/523623`. The returned JSON has the following format:
 
@@ -140,7 +140,7 @@ Issue a GET request to `/task/<ID>` to obtain information about the task of the 
 
 The time is in milliseconds since the Epoch. The data is free-form, whatever was put into the data field when the task was last updated or created.
 
-##`/tasks/<ID>[,<ID>,...]`
+## `/tasks/<ID>[,<ID>,...]`
 
 This is like `/task/<ID>` except that you can specify a comma-separated list of IDs and a list of task JSON structures will be returned, e.g., issuing a GET to `/tasks/523623,523624` would produce the following (provided that the tasks exist, otherwise nonexistent tasks return `null`):
 
@@ -157,7 +157,7 @@ This is like `/task/<ID>` except that you can specify a comma-separated list of 
     "ownerid": 2354}]
 ```
 
-##`/group/<Group>`
+## `/group/<Group>`
 
 To obtain a list of tasks from a specified group, issue a GET request to `/group/<Group>` where `<Group>` is the name of the group of interest.
 
@@ -170,7 +170,7 @@ The default is no limit and only unowned tasks.
 
 The result is the same as for `/tasks/...`: a list of tasks from the task store.
 
-##`/update`
+## `/update`
 
 To update tasks (including add, modify, or delete), issue a POST request to `/update` with the request information in a JSON object, the structure of which is exemplified here:
 
@@ -216,7 +216,7 @@ The JSON returned is an object with two fields: `tasks` and `error`. The `tasks`
 * `owned`: a list of task IDs that could not be changed because they were owned by another client.
 * `bugs`: a list of errors indicating that some unexpected conditions occurred.
 
-##`/claim`
+## `/claim`
 
 To claim a task, POST a JSON object to `/claim` with the following layout:
 
