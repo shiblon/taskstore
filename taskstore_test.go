@@ -50,7 +50,7 @@ func ExampleTaskStore() {
 	// journaling.
 	store, err := OpenStrict(jr)
 	if err != nil {
-		fmt.Print("error opening taskstore: %v\n", err)
+		fmt.Printf("error opening taskstore: %v\n", err)
 		return
 	}
 	defer store.Close()
@@ -354,7 +354,7 @@ func ExampleTaskStore_mapReduce() {
 			mapperID := rand.Int31()
 			for {
 				// Get a task for ten seconds.
-				maptask, err := store.Claim(mapperID, "map", int64(10 * time.Second), nil)
+				maptask, err := store.Claim(mapperID, "map", int64(10*time.Second), nil)
 				if err != nil {
 					panic(fmt.Sprintf("error retrieving tasks: %v", err))
 				}
@@ -397,7 +397,7 @@ func ExampleTaskStore_mapReduce() {
 		if len(tasks) == 0 {
 			break
 		}
-		time.Sleep(time.Duration(rand.Int63n(maxSleepTime)+1))
+		time.Sleep(time.Duration(rand.Int63n(maxSleepTime) + 1))
 	}
 
 	// Now do reductions. To do this we list all of the reduceword groups and
@@ -429,7 +429,7 @@ func ExampleTaskStore_mapReduce() {
 		go func() {
 			reducerID := rand.Int31()
 			for {
-				grouptask, err := store.Claim(reducerID, "reduce", int64(30 * time.Second), nil)
+				grouptask, err := store.Claim(reducerID, "reduce", int64(30*time.Second), nil)
 				if err != nil {
 					panic(fmt.Sprintf("failed to get reduce task: %v", err))
 				}
@@ -478,7 +478,7 @@ func ExampleTaskStore_mapReduce() {
 		if len(tasks) == 0 {
 			break
 		}
-		time.Sleep(time.Duration(rand.Int63n(maxSleepTime)+1))
+		time.Sleep(time.Duration(rand.Int63n(maxSleepTime) + 1))
 	}
 
 	// And now we have the finished output in the task store.
@@ -568,7 +568,7 @@ func TestTaskStore_Fuzz(t *testing.T) {
 				}
 				taskPool[i] = &Task{
 					Group: groupPool[rand.Intn(len(groupPool))],
-					AT:    Now() + rand.Int63n(int64(time.Second)) - 5 * int64(time.Millisecond),
+					AT:    Now() + rand.Int63n(int64(time.Second)) - 5*int64(time.Millisecond),
 					Data:  dv.Interface().([]byte),
 				}
 			}
@@ -641,7 +641,7 @@ func TestTaskStore_Fuzz(t *testing.T) {
 				}
 				var duration int64 = -10 * int64(time.Second)
 				if r < 70 {
-					duration = Now() + 5 * int64(time.Second)
+					duration = Now() + 5*int64(time.Second)
 				}
 				cond = NewClaimCond(owner, group, duration, depends)
 			case Close:
@@ -661,14 +661,14 @@ func TestTaskStore_Fuzz(t *testing.T) {
 				cond = NewNumTasksCond()
 			case Tasks:
 				var ids []int64
-				for i := w.Draw; i < w.Draw + (w.Draw % 7); i++ {
+				for i := w.Draw; i < w.Draw+(w.Draw%7); i++ {
 					if t := randTask(i); t != nil {
 						ids = append(ids, t.ID)
 					}
 				}
-				if w.Draw % 100 > 90 {
+				if w.Draw%100 > 90 {
 					// Add an unknown ID to exercise failure.
-					ids = append(ids, int64(w.Draw % 1000))
+					ids = append(ids, int64(w.Draw%1000))
 				}
 				cond = NewTasksCond(ids)
 			case Update:

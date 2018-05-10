@@ -26,8 +26,8 @@ import (
 
 	"time"
 
-	"entrogo.com/taskstore/keyheap"
 	"entrogo.com/taskstore/journal"
+	"entrogo.com/taskstore/keyheap"
 )
 
 var (
@@ -286,6 +286,7 @@ func (t *TaskStore) Tasks(ids []int64) []*Task {
 	return resp.Val.([]*Task)
 }
 
+// Snapshotting indicates whether snapshotting is in progress.
 func (t *TaskStore) Snapshotting() bool {
 	resp := t.sendRequest(nil, t.snapshottingChan)
 	return resp.Val.(bool)

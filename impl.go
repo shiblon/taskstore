@@ -22,8 +22,8 @@ import (
 	"strings"
 	"time"
 
-	"entrogo.com/taskstore/keyheap"
 	"entrogo.com/taskstore/journal"
+	"entrogo.com/taskstore/keyheap"
 )
 
 // TODO: move snapshot functionality completely out, make it operate only on files.
@@ -328,11 +328,10 @@ func (t *TaskStore) heapPush(task *Task) {
 	h.Push(task)
 }
 
+// canModify indicates whether a task is modifiable, meaning it's either
+// expired or owned by the current client.
 func canModify(now int64, clientID int32, task *Task) bool {
-	if task.AT > now && clientID != task.OwnerID {
-		return false
-	}
-	return true
+	return task.AT <= now || clientID == task.OwnerID
 }
 
 // missingDependencies returns the list of dependencies that are not in the store.

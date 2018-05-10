@@ -127,7 +127,7 @@ func (c *ClaimCond) Post() error {
 	}
 	if hasNil >= 0 {
 		if c.RetErr == nil {
-			return fmt.Errorf("Claim Postcondition: dependency %d missing, but claim succeeded: %v.\n", hasNil)
+			return fmt.Errorf("Claim Postcondition: dependency %d missing, but claim succeeded", hasNil)
 		}
 		// Got an error when there were failed dependencies. That's good.
 		return nil
