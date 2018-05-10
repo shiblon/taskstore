@@ -672,7 +672,9 @@ func (t *TaskStore) handle() {
 			for _, v := range t.tasks {
 				tasks = append(tasks, v)
 			}
-			sort.Sort(taskList(tasks))
+			sort.Slice(tasks, func(i, j int) bool {
+				return tasks[i].ID < tasks[j].ID
+			})
 			req.ResultChan <- response{tasks, nil}
 		case req := <-t.numTasksChan:
 			// In this implementation, the number of tasks is always equivalent to the latest task ID.
@@ -707,18 +709,4 @@ func (t *TaskStore) handle() {
 			t.doAppend(transaction)
 		}
 	}
-}
-
-type taskList []*Task
-
-func (l taskList) Len() int {
-	return len(l)
-}
-
-func (l taskList) Swap(i, j int) {
-	l[i], l[j] = l[j], l[i]
-}
-
-func (l taskList) Less(i, j int) bool {
-	return l[i].ID < l[j].ID
 }
