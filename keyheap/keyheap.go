@@ -38,7 +38,6 @@ type Item interface {
 type KeyHeap struct {
 	itemHeap heapImpl
 	itemMap  heapMap
-	randChan chan float64
 }
 
 // New creates a new empty KeyHeap.
@@ -51,19 +50,12 @@ func NewFromItems(items []Item) *KeyHeap {
 	q := &KeyHeap{
 		itemHeap: make(heapImpl, len(items)),
 		itemMap:  make(heapMap),
-		randChan: make(chan float64, 1),
 	}
 	for i, item := range items {
 		ti := &indexedItem{index: i, item: item}
 		q.itemHeap[i] = ti
 		q.itemMap[item.Key()] = ti
 	}
-	// Provide thread-safe random values.
-	go func() {
-		for {
-			q.randChan <- rand.Float64()
-		}
-	}()
 
 	if q.Len() > 1 {
 		heap.Init(&q.itemHeap)
@@ -188,7 +180,7 @@ func (q *KeyHeap) PopRandomConstrained(maxPriority int64) Item {
 		if len(choices) == 0 {
 			break
 		}
-		choiceIndex := int(math.Floor(<-q.randChan * float64(len(choices))))
+		choiceIndex := int(math.Floor(rand.Float64() * float64(len(choices))))
 		if choiceIndex == 0 {
 			chosen = choices[choiceIndex]
 			break
