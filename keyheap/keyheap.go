@@ -93,29 +93,12 @@ func (q *KeyHeap) Pop() Item {
 
 // PopAt removes an element from the specified index in the heap in O(log(n)) time.
 func (q *KeyHeap) PopAt(idx int) Item {
-	item := q.PeekAt(idx)
-	if item == nil {
+	ti := heap.Remove(&q.itemHeap, idx).(*indexedItem)
+	if ti == nil {
 		return nil
 	}
-	// This uses basic heap operations to accomplish removal from the middle. A
-	// couple of key things make this possible.
-	// - A subslice still points to the underlying array, and has capacity extending to the end.
-	// - Adding a smallest element to a prefix heap does not invalidate the rest of the heap.
-	// - Pushing an element onto a heap puts it at the end and bubbles it up.
-	// So, we take the heap prefix up to but not including idx and push the nil item.
-	// This overwrites the element we want to remove with nil (adds to the end
-	// of the prefix heap, overwriting underlying array storage, since capacity
-	// is still there), and bubbles it to the very top (see Less below, it knows about nil).
-	subheap := q.itemHeap[:idx]
-	heap.Push(&subheap, &indexedItem{item: nil})
-	if q.itemHeap[0].item != nil {
-		panic("Bubbled nil item to top, but it didn't make it.")
-	}
-	// Then we remove the nil item at the top.
-	heap.Pop(&q.itemHeap)
-	delete(q.itemMap, item.Key())
-
-	return item
+	delete(q.itemMap, ti.item.Key())
+	return ti.item
 }
 
 // Len returns the size of the heap.
