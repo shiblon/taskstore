@@ -195,11 +195,6 @@ func (h heapImpl) Len() int {
 }
 
 func (h heapImpl) Less(i, j int) bool {
-	if h[i].item == nil {
-		return true
-	} else if h[j].item == nil {
-		return false
-	}
 	return h[i].item.Priority() < h[j].item.Priority()
 }
 
