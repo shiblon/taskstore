@@ -152,8 +152,7 @@ func (q *KeyHeap) PopRandomConstrained(maxPriority int64) Item {
 	for idx < q.Len() && q.PeekAt(idx).Priority() <= maxPriority {
 		left := idx*2 + 1
 		right := left + 1
-		choices := make([]int, 1, 3)
-		choices[0] = idx
+		choices := []int{idx}
 		if left < q.Len() && q.PeekAt(left).Priority() <= maxPriority {
 			choices = append(choices, left)
 		}
